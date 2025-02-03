@@ -1,0 +1,17 @@
+# Dependency directories
+node_modules/
+
+# Logs
+npm-debug.log*
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# dotenv environment variables file
+.env
+
+# macOS
+.DS_Store
