@@ -1,0 +1,55 @@
+/* Navbar container */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background-color: #fff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+/* Profile dropdown styles */
+.profile-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  width: 200px;
+  z-index: 1000; /* Ensures it's above everything */
+  overflow: hidden;
+}
+
+/* Logout button on top */
+.logout-button {
+  background: #ff4d4f;
+  color: white;
+  padding: 10px 15px;
+  font-size: 14px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+}
+
+.logout-button:hover {
+  background: #d9363e;
+}
+
+/* Profile dropdown links */
+.profile-dropdown a {
+  padding: 12px 15px;
+  text-decoration: none;
+  color: black;
+  display: block;
+  font-size: 14px;
+}
+
+.profile-dropdown a:hover {
+  background: #f1f1f1;
+}

@@ -29,11 +29,11 @@ const Login = () => {
           transactions: [] // Empty array for transactions
         });
 
-        router.push('/dashboard'); // Redirect to dashboard after successful sign-up
+        router.push('/home'); // Redirect to dashboard after successful sign-up
       } else {
         // Attempt login with email and password
         await signInWithEmailAndPassword(auth, email, password);
-        router.push('/dashboard'); // Redirect to dashboard after successful login
+        router.push('/home'); // Redirect to dashboard after successful login
       }
     } catch (error: any) {
       console.error("Error during auth operation:", error.message); // Log error to console

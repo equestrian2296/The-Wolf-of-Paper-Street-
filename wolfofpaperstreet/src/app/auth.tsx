@@ -19,7 +19,7 @@ export default function Login() {
         const { email, password } = data;
         try {
             await signInWithEmailAndPassword(auth, email, password);
-            router.push("/dashboard"); // Redirect after login
+            router.push("/home"); // Redirect after login
         } catch (error) {
             setError((error as Error).message); // Explicit type assertion
         }
