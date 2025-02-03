@@ -3,19 +3,17 @@
 .app-container {
     display: flex;
     flex-direction: column;  /* Stack elements vertically */
-    align-items: center; /* Center horizontally */
-    padding: 20px;
+    /* Center horizontally */
     height: 100vh; /* Full screen height */
     box-sizing: border-box;
   }
   
   .main-content {
     display: flex;
-    flex-direction: row;  /* Arrange the components side by side */
-    justify-content: space-between;
+    flex-direction: column;  /* Arrange the components side by side */
     width: 100%; /* Ensure it takes the full width */
     max-width: 1200px; /* Optional: Limit the max width of the content */
-    margin-top: 20px;
+    margin-top: 10px;
   }
   
   .stock-list-container,

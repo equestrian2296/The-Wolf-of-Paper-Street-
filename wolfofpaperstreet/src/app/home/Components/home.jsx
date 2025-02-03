@@ -26,7 +26,8 @@ const StockScroller = () => {
           ease: "linear",
         }}
       >
-        {[...stockData, ...stockData].map((stock, index) => (
+         <div>
+      {[...stockData, ...stockData].map((stock, index) => (
           <div key={index} className="stock-item">
             <span className="stock-name">{stock.name}</span>
             <span className="stock-value">{stock.value}</span>
@@ -39,7 +40,10 @@ const StockScroller = () => {
             </span>
           </div>
         ))}
+      </div>
+        
       </motion.div>
+     
     </div>
   );
 };
