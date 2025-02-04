@@ -96,7 +96,7 @@ const HomePage = () => {
           </button>
         </Link>
 
-        <Link href="/stocks-portfolio">
+        <Link href="/stocks">
           <button className="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg border-2 border-green-400 hover:bg-green-700">
             Go Trade
           </button>

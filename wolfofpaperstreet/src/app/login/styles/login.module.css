@@ -30,6 +30,7 @@
   .inputGroup {
     margin-bottom: 1rem;
     width: 100%;
+
   }
   
   .inputGroup label {
@@ -47,6 +48,7 @@
     border-radius: 5px;
     font-size: 1rem;
     transition: all 0.3s ease;
+    color: black;
   }
   
   .input:focus {
