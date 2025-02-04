@@ -1,0 +1,68 @@
+/* General Container Styling */
+.stock-container {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Section Styling */
+  .growth-section, .drop-section {
+    width: 48%;
+  }
+  
+  /* Header Styling */
+  h2 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    color: #343a40;
+    border-bottom: 2px solid #dee2e6;
+    padding-bottom: 5px;
+  }
+  
+  /* Stock Item Styling */
+  .stock-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+  }
+  
+  /* Positive and Negative Indicators */
+  .stock-item .positive {
+    color: #28a745; /* Green for growth */
+  }
+  
+  .stock-item .negative {
+    color: #dc3545; /* Red for drop */
+  }
+  
+  /* Link Styling */
+  a {
+    display: block;
+    margin-top: 15px;
+    color: #007bff;
+    text-decoration: none;
+  }
+  
+  a:hover {
+    text-decoration: underline;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .stock-container {
+      flex-direction: column;
+    }
+  
+    .growth-section, .drop-section {
+      width: 100%;
+    }
+  }
+  

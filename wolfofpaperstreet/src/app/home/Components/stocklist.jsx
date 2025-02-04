@@ -1,6 +1,8 @@
 import React from "react";
+import Link from "next/link";
 import StockItem from "./stockItem";
 import { stockData } from "../data/stockdata";
+import './stockList.css';
 
 const StockList = () => {
   return (
@@ -9,7 +11,9 @@ const StockList = () => {
       <div className="growth-section">
         <h2>Largest Daily Growth</h2>
         {stockData.largestDailyGrowth.map((stock, index) => (
-          <StockItem key={index} stock={stock} type="positive" />
+          <Link key={index} href={`/stock/${stock.symbol}`} passHref>
+            <StockItem stock={stock} type="positive" />
+          </Link>
         ))}
         <a href="#">See all stocks with largest daily growth</a>
       </div>
@@ -18,7 +22,9 @@ const StockList = () => {
       <div className="drop-section">
         <h2>Largest Daily Drop</h2>
         {stockData.largestDailyDrop.map((stock, index) => (
-          <StockItem key={index} stock={stock} type="negative" />
+          <Link key={index} href={`/stock/${stock.symbol}`} passHref>
+            <StockItem stock={stock} type="negative" />
+          </Link>
         ))}
         <a href="#">See all stocks with largest daily drop</a>
       </div>
