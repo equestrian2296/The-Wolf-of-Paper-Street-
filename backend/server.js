@@ -159,14 +159,85 @@ app.post('/backtest', async (req, res) => {
     }
 });
 
+
+
+// Function to convert date (YYYY-MM-DD) to UNIX timestamp (seconds)
+function convertToTimestamp(dateStr) {
+    return Math.floor(new Date(dateStr).getTime() / 1000);
+}
+
+// Function to fetch historical data from Yahoo Finance
+async function getHistoricalData(symbol, from, to) {
+    try {
+        const results = await yahooFinance.historical(symbol, {
+            period1: from * 1000,  // Convert seconds to milliseconds
+            period2: to * 1000,    // Convert seconds to milliseconds
+            interval: "1d"
+        });
+
+        return results.map(day => day.close); // Extract closing prices
+    } catch (error) {
+        throw new Error("Error fetching Yahoo Finance data");
+    }
+}
+
+// Function to calculate Sharpe Ratio
+function calculateSharpeRatio(prices, riskFreeRate = 0.02) {
+    let returns = [];
+
+    for (let i = 1; i < prices.length; i++) {
+        let dailyReturn = (prices[i] - prices[i - 1]) / prices[i - 1];
+        returns.push(dailyReturn);
+    }
+
+    let meanReturn = returns.reduce((a, b) => a + b, 0) / returns.length;
+    let squaredDiffs = returns.map(r => Math.pow(r - meanReturn, 2));
+    let stdDev = Math.sqrt(squaredDiffs.reduce((a, b) => a + b, 0) / returns.length);
+
+    let sharpeRatio = (meanReturn - riskFreeRate / 252) / stdDev;
+
+    return { sharpeRatio, stdDev, meanReturn };
+}
+
+// API Endpoint for Sharpe Ratio Calculation (POST)
+app.post("/sharpe", async (req, res) => {
+    try {
+        let { symbol, from, to } = req.body;
+
+        if (!symbol) {
+            return res.status(400).json({ error: "Please provide a stock symbol" });
+        }
+
+        // If 'from' and 'to' are missing, default to last 1 year
+        if (!from || !to) {
+            to = Math.floor(Date.now() / 1000);
+            from = to - (365 * 24 * 60 * 60);
+        } else {
+            from = isNaN(from) ? convertToTimestamp(from) : parseInt(from);
+            to = isNaN(to) ? convertToTimestamp(to) : parseInt(to);
+        }
+
+        const prices = await getHistoricalData(symbol, from, to);
+        if (!prices || prices.length === 0) return res.status(400).json({ error: "No data found" });
+
+        const { sharpeRatio, stdDev, meanReturn } = calculateSharpeRatio(prices);
+
+        res.json({
+            symbol,
+            from: new Date(from * 1000).toISOString().split("T")[0],
+            to: new Date(to * 1000).toISOString().split("T")[0],
+            sharpeRatio: sharpeRatio.toFixed(2),
+            standardDeviation: stdDev.toFixed(4),
+            meanReturn: (meanReturn * 100).toFixed(2) + "%"
+        });
+
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
 
-
-// const app = require('./src/app');
-// const port = process.env.PORT || 5000;
-
-// app.listen(port, () => {
-//   console.log(`Server running at http://localhost:${port}`);
-// });
