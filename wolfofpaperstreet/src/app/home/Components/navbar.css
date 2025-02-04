@@ -43,7 +43,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: rgba(255, 255, 255, 0.8);
+  background: radial-gradient(circle, #1e1e1e, #add8e6);
   margin: 0 10px;
   transition: transform 0.3s ease;
   border: none;
@@ -53,6 +53,12 @@
 
 .radial-menu.open .menu-item {
   transform: translateY(-30px);
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 0 0 4px rgba(69, 69, 69, 0.723);
+}
+
+.radial-menu.open .menu-item:hover {
+  box-shadow: 0 0 0 7px rgba(146, 146, 146, 0.644);
 }
 
 .radial-menu.open .menu-item:nth-child(1) { transform: translate(calc(-100% - 20px), -100%); }
