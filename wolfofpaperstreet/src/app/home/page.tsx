@@ -1,31 +1,89 @@
-import React from "react";
-import Navbar from "./Components/navbar"; // Import the Navbar component
+"use client";
+import React, { useState } from "react";
+import Navbar from "./Components/navbar";
 import StockScroller from "./Components/home";
-import "./App.css";
 import StockList from "./Components/stocklist";
+import YouTubeCarousel from "./Components/YoutubeCarsouel";
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import Link from "next/link";
 
-import YouTubeCarousel from "./Components/YoutubeCarsouel";
-function homePage() {
+const HomePage = () => {
+  const [userData] = useState({
+    name: "John Doe",
+    avatar: "https://via.placeholder.com/80",
+    balance: "10,000",
+    profit: "1,250",
+    wishlist: ["AAPL", "GOOGL", "TSLA"],
+  });
+
+  const [dailyStreak] = useState([
+    { day: "Mon", streak: 1 },
+    { day: "Tue", streak: 2 },
+    { day: "Wed", streak: 4 },
+    { day: "Thu", streak: 5 },
+    { day: "Fri", streak: 6 },
+    { day: "Sat", streak: 7 },
+    { day: "Sun", streak: 8 },
+  ]);
+
   return (
-    <div className="app-container">
-      <Navbar /> {/* Navbar stays at the top */}
-      
-      <div className="main-content">
-      <div className="stock-scroller-container">
-          <StockScroller /> {/* Stock scroller component */}
+    <div className="relative min-h-screen bg-gray-900 text-white p-6">
+      {/* Layout Container */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12 relative">
+        {/* YouTube Floating Widget */}
+        <div className="absolute top-5 right-5 w-56 h-36 bg-black bg-opacity-70 rounded-lg p-2 shadow-lg border-2 border-blue-400 z-10">
+          <YouTubeCarousel />
         </div>
-        <div className="stock-list-container">
-          <StockList /> {/* Stock list component */}
+
+        {/* Stock Scroller */}
+        <div className="bg-gray-900 bg-opacity-70 p-4 rounded-lg border-2 border-green-400 shadow-lg col-span-3">
+          <StockScroller />
         </div>
-        <h1> Reccomendeed Videos for watching</h1>
-        <YouTubeCarousel />
-        
-       
-        <Link href="/stock/AAPL" > View Charts and Buy Page</Link> {/* Login link */}
+
+        {/* Stock List */}
+        <div className="bg-gray-900 bg-opacity-70 p-4 rounded-lg border-2 border-pink-400 shadow-lg">
+          <StockList />
+        </div>
+
+        {/* User Profile */}
+        <div className="bg-gray-800 p-4 rounded-lg border-2 border-yellow-400 shadow-lg flex flex-col items-center">
+          <img src={userData.avatar} alt="User Avatar" className="rounded-full w-16" />
+          <h2 className="mt-2">{userData.name}</h2>
+          <p className="text-green-400">Balance: ${userData.balance}</p>
+        </div>
+
+        {/* Daily Streak */}
+        <div className="bg-gray-800 p-4 rounded-lg border-2 border-orange-400 shadow-lg w-full">
+          <h3 className="text-lg">Daily Streak</h3>
+          <ResponsiveContainer width="100%" height={80}>
+            <LineChart data={dailyStreak}>
+              <XAxis dataKey="day" stroke="#ffffff" />
+              <YAxis stroke="#ffffff" />
+              <Tooltip />
+              <Line type="monotone" dataKey="streak" stroke="#00ffea" strokeWidth={2} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Floating Buttons */}
+      <div className="fixed bottom-24 left-10 right-10 flex justify-between">
+        <button className="bg-purple-600 text-white px-6 py-3 rounded-lg shadow-lg border-2 border-purple-400 hover:bg-purple-800">
+          Trade in Past
+        </button>
+        <Link href="/stock/AAPL">
+          <button className="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg border-2 border-green-400 hover:bg-green-700">
+            Go Trade
+          </button>
+        </Link>
+      </div>
+
+      {/* Footer Navbar */}
+      <div className="fixed bottom-0 left-0 w-full bg-gray-900 p-3 text-center border-t-2 border-blue-400 shadow-lg">
+        <Navbar />
       </div>
     </div>
   );
-}
+};
 
-export default homePage;
+export default HomePage;
