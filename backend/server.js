@@ -1,8 +1,11 @@
+const OpenAI = require("openai");
 const express = require('express');
 const cors = require('cors');
 const fetchStockData = require('./yahooFinance');
 const yahooFinance = require('yahoo-finance2').default;
+const { RSI, SMA, EMA } = require("technicalindicators");
 const app = express();
+
 app.use(cors());
 const port = 5000;
 const stocks = [
@@ -234,6 +237,109 @@ app.post("/sharpe", async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
+});
+
+
+/// Make the Techincal Indicators for the stock market
+
+
+
+// Function to fetch closing prices from Yahoo Finance
+async function getClosingPrices(symbol, period = 20) {
+    try {
+        const result = await yahooFinance.historical(symbol, {
+            period1: "2024-01-01", // Fetch from Jan 1, 2024
+            interval: "1d",
+        });
+
+        // Extract closing prices for the last 'period' days
+        return result.slice(-period).map((day) => day.close);
+    } catch (error) {
+        console.error("Error fetching stock data:", error);
+        return null;
+    }
+}
+
+// API to calculate RSI, SMA, and EMA in a single request
+app.get("/indicators", async (req, res) => {
+    const symbol = req.query.symbol || "AAPL"; // Default to Apple stock
+    const rsiPeriod = parseInt(req.query.rsiPeriod) || 14;
+    const smaPeriod = parseInt(req.query.smaPeriod) || 10;
+    const emaPeriod = parseInt(req.query.emaPeriod) || 10;
+
+    const closingPrices = await getClosingPrices(symbol, Math.max(rsiPeriod, smaPeriod, emaPeriod) + 1);
+    if (!closingPrices) return res.status(500).json({ error: "Failed to fetch stock data" });
+
+    const rsi = RSI.calculate({ values: closingPrices, period: rsiPeriod }).pop();
+    const sma = SMA.calculate({ values: closingPrices, period: smaPeriod }).pop();
+    const ema = EMA.calculate({ values: closingPrices, period: emaPeriod }).pop();
+
+    res.json({ symbol, RSI: rsi, SMA: sma, EMA: ema });
+});
+
+
+
+
+// AI naaylze 
+const OPENAI_API_KEY = "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";
+const PERPLEXITY_API_KEY = process.env.PERPLEXITY_API_KEY;
+const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
+const openai = new OpenAI({
+  baseURL: "https://models.inference.ai.azure.com",
+  apiKey: OPENAI_API_KEY
+});
+
+
+// 🔥 API Endpoint for Stock Analysis
+app.post("/analyze", async (req, res) => {
+  try {
+      const { stockSymbol } = req.body; // Expecting { "stockSymbol": "AAPL" }
+
+      if (!stockSymbol) {
+          return res.status(400).json({ error: "Stock symbol is required" });
+      }
+
+      // 1️⃣ Fetch Real-Time Stock Data
+      const stockData = await yahooFinance.quoteSummary(stockSymbol, { modules: ["price", "summaryDetail"] });
+
+      if (!stockData || !stockData.price) {
+          return res.status(404).json({ error: "Stock data not found" });
+      }
+
+      // Extract relevant stock info
+      const { regularMarketPrice, marketCap, fiftyDayAverage, twoHundredDayAverage } = stockData.price;
+      const { forwardPE, dividendYield } = stockData.summaryDetail;
+
+      // 2️⃣ Send Data to OpenAI for Analysis
+      const prompt = `
+          You are a stock trading assistant. Based on the following real-time stock data, provide a recommendation on whether it's a good buying opportunity:
+          - Stock Symbol: ${stockSymbol}
+          - Current Price: $${regularMarketPrice}
+          - 50-Day Moving Average: $${fiftyDayAverage}
+          - 200-Day Moving Average: $${twoHundredDayAverage}
+          - Forward P/E Ratio: ${forwardPE}
+          - Market Cap: ${marketCap}
+          - Dividend Yield: ${dividendYield ? dividendYield * 100 + "%" : "N/A"}
+      `;
+
+      const response = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [
+              { role: "system", content: "Analyze the stock data and provide a buy/sell recommendation." },
+              { role: "user", content: prompt },
+          ],
+          temperature: 0.7,
+          max_tokens: 200,
+          top_p: 1,
+      });
+
+      const recommendation = response.choices[0].message.content;
+      res.json({ stockSymbol, recommendation });
+
+  } catch (error) {
+      console.error("Error:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+  }
 });
 
 
