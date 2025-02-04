@@ -34,14 +34,14 @@ const Navbar = () => {
     localStorage.removeItem("user"); // Remove user info if stored
 
     // Redirect to login or home page
-    router.push("/login"); // Update to your actual login page route
+    router.push("/landing"); // Update to your actual login page route
   };
 
   return (
     <nav className="navbar">
       <div className="navbar-left">
         <a href="/" className="company-name">
-          CompanyName
+          The Wolf of Paper Street
         </a>
       </div>
 
