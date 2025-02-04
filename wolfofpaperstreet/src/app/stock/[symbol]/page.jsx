@@ -7,8 +7,14 @@ import { useParams } from 'next/navigation';
 import Navbar from '../../home/Components/navbar';
 import dynamic from 'next/dynamic';
 import '../../home/Components/stockPage.css';
+import { app } from "../../../../Firebase/firebase";
+import { getAuth } from "firebase/auth";
+import { getFirestore, collection, addDoc } from "firebase/firestore";
+import { doc, updateDoc, getDoc, query, where, getDocs, deleteDoc } from "firebase/firestore";
 
 const ReactApexChart = dynamic(() => import('react-apexcharts'), { ssr: false });
+const auth = getAuth(app);
+const db = getFirestore(app);
 
 const StockPage = () => {
   const { symbol } = useParams();
@@ -92,37 +98,49 @@ const showResults = async () => {
   const handleBuy = () => setShowBuyModal(true);
   const handleSell = () => setShowSellModal(true);
   
-
   const executeBuy = async () => {
-    if (!quantity || !stopLoss) return alert('Please enter both quantity and stop loss');
+    if (!quantity || !stopLoss) {
+      alert('Please enter both quantity and stop loss');
+      return;
+    }
   
     try {
-      // Fetch latest stock price from Twelve Data API (Replace API_KEY with your actual API key)
-      const response = await fetch(`https://api.twelvedata.com/price?symbol=${symbol}&apikey=YOUR_API_KEY`);
-  
+      const response = await fetch(`https://api.twelvedata.com/price?symbol=${symbol}&apikey=ab4969be7e034d59a46a75aa65c5dc26`);
       if (!response.ok) throw new Error('Failed to fetch latest stock price');
   
       const data = await response.json();
       const basePrice = data.price;
-  
       if (!basePrice) throw new Error('Invalid stock data received');
   
-      const orderData = {
-        Quantity: Number(quantity),
-        StockName: symbol,
-        basePrice: Number(basePrice),
-        stopLoss: Number(stopLoss),
-        uid: 'hbdsjfjsfsbdf', // Replace with actual user ID
-      };
+      const user = auth.currentUser;
+      if (!user) throw new Error('User not authenticated');
   
-      // Store the order in Firebase Firestore
-      const firestore = firebase.firestore();
-      await firestore.collection('orders').add(orderData);
+      const userRef = doc(db, "users", user.uid);
+      const stockQuery = query(collection(db, "orders"), where("uid", "==", user.uid), where("StockName", "==", symbol));
+      const stockSnapshot = await getDocs(stockQuery);
   
-      console.log('Order placed successfully:', orderData);
+      if (!stockSnapshot.empty) {
+        // Stock exists, update quantity
+        const stockDoc = stockSnapshot.docs[0];
+        const updatedQuantity = stockDoc.data().Quantity + Number(quantity);
+  
+        await updateDoc(stockDoc.ref, { Quantity: updatedQuantity });
+      } else {
+        // Stock does not exist, create new entry
+        await addDoc(collection(db, "orders"), {
+          Quantity: Number(quantity),
+          StockName: symbol,
+          basePrice,
+          stopLoss: Number(stopLoss),
+          uid: user.uid,
+        });
+      }
+      
+      console.log('Order placed successfully');
+      alert('Order placed successfully');
     } catch (error) {
       console.error('Error placing order:', error);
-      alert('Error placing order. Please try again later.');
+      alert(error.message);
     }
   
     setShowBuyModal(false);
@@ -130,11 +148,57 @@ const showResults = async () => {
     setStopLoss('');
   };
   
-  const executeSell = () => {
+  const executeSell = async () => {
     if (!quantity) return alert('Please enter the quantity to sell');
-    console.log(`Selling ${quantity} shares of ${symbol}`);
-    setShowSellModal(false); setQuantity('');
+  
+    try {
+      const response = await fetch(`https://api.twelvedata.com/price?symbol=${symbol}&apikey=ab4969be7e034d59a46a75aa65c5dc26`);
+      if (!response.ok) throw new Error('Failed to fetch latest stock price');
+  
+      const data = await response.json();
+      const basePrice = data.price;
+      if (!basePrice) throw new Error('Invalid stock data received');
+  
+      const user = auth.currentUser;
+      if (!user) throw new Error('User not authenticated');
+  
+      const userRef = doc(db, "users", user.uid);
+      const stockQuery = query(collection(db, "orders"), where("uid", "==", user.uid), where("StockName", "==", symbol));
+      const stockSnapshot = await getDocs(stockQuery);
+  
+      if (stockSnapshot.empty) throw new Error('You do not own this stock');
+  
+      const stockDoc = stockSnapshot.docs[0];
+      const currentQuantity = stockDoc.data().Quantity;
+      const sellQuantity = Number(quantity);
+  
+      if (sellQuantity > currentQuantity) throw new Error('Not enough stock to sell');
+  
+      if (sellQuantity === currentQuantity) {
+        // If selling all, remove stock entry
+        await deleteDoc(stockDoc.ref);
+      } else {
+        // Otherwise, update quantity
+        await updateDoc(stockDoc.ref, { Quantity: currentQuantity - sellQuantity });
+      }
+  
+      // Update user's balance
+      const userSnap = await getDoc(userRef);
+      const currentBalance = userSnap.exists() ? userSnap.data().balance : 0;
+      const updatedBalance = currentBalance + (sellQuantity * basePrice);
+  
+      await updateDoc(userRef, { balance: updatedBalance });
+      alert('Stock sold successfully');
+      console.log('Stock sold successfully');
+    } catch (error) {
+      console.error('Error selling stock:', error);
+      alert(error.message);
+    }
+  
+    setShowSellModal(false);
+    setQuantity('');
   };
+  
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
@@ -202,7 +266,6 @@ const showResults = async () => {
             <div className="modal-footer">
               <button className="btn cancel-btn" onClick={() => showBuyModal ? setShowBuyModal(false) : setShowSellModal(false)}>Cancel</button>
               <button className="btn confirm-btn" onClick={showBuyModal ? executeBuy : executeSell}>Confirm {showBuyModal ? 'Buy' : 'Sell'}</button>
-             
             </div>
           </div>
         </div>
