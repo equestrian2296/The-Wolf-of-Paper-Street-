@@ -57,12 +57,12 @@ const HomePage = () => {
         <StockScroller />
       </div>
 
-      {/* Grid Layout */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
-        {/* Stock List */}
-        <div className="bg-gray-900 bg-opacity-70 p-4 rounded-lg border-2 border-pink-400 shadow-lg">
-          <StockList />
-        </div>
+        {/* Grid Layout */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
+          {/* Stock List */}
+          <div className="bg-gray-900 bg-opacity-70 p-4 rounded-lg border-2 border-pink-400 shadow-lg">
+            <StockList />
+          </div>
 
         {/* User Profile - Resized */}
         <div className="bg-gray-800 p-6 rounded-lg border-2 border-yellow-400 shadow-lg flex flex-col items-center w-full max-w-xs mx-auto">
@@ -74,19 +74,19 @@ const HomePage = () => {
           )}
         </div>
 
-        {/* Daily Streak */}
-        <div className="bg-gray-800 p-6 rounded-lg border-2 border-orange-400 shadow-lg w-full">
-          <h3 className="text-lg">Daily Streak</h3>
-          <ResponsiveContainer width="100%" height={80}>
-            <LineChart data={dailyStreak}>
-              <XAxis dataKey="day" stroke="#ffffff" />
-              <YAxis stroke="#ffffff" />
-              <Tooltip />
-              <Line type="monotone" dataKey="streak" stroke="#00ffea" strokeWidth={2} />
-            </LineChart>
-          </ResponsiveContainer>
+          {/* Daily Streak */}
+          <div className="bg-gray-800 p-6 rounded-lg border-2 border-orange-400 shadow-lg w-full">
+            <h3 className="text-lg">Daily Streak</h3>
+            <ResponsiveContainer width="100%" height={80}>
+              <LineChart data={dailyStreak}>
+                <XAxis dataKey="day" stroke="#ffffff" />
+                <YAxis stroke="#ffffff" />
+                <Tooltip />
+                <Line type="monotone" dataKey="streak" stroke="#00ffea" strokeWidth={2} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
         </div>
-      </div>
 
       {/* Floating Buttons */}
       <div className="fixed bottom-24 left-10 right-10 flex justify-between">
