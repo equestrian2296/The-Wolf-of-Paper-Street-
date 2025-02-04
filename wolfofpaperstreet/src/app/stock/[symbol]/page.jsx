@@ -29,7 +29,9 @@ const StockPage = () => {
       hasFetched.current = true;
     }
   }, []);
-  
+
+  // functioms for buying the values and storing in the db
+
    
   const [showOptions, setShowOptions] = useState(false);
 const [result, setResult] = useState(null);
@@ -89,11 +91,45 @@ const showResults = async () => {
 
   const handleBuy = () => setShowBuyModal(true);
   const handleSell = () => setShowSellModal(true);
-  const executeBuy = () => {
+  
+
+  const executeBuy = async () => {
     if (!quantity || !stopLoss) return alert('Please enter both quantity and stop loss');
-    console.log(`Buying ${quantity} shares of ${symbol} with stop loss at ${stopLoss}`);
-    setShowBuyModal(false); setQuantity(''); setStopLoss('');
+  
+    try {
+      // Fetch latest stock price from Twelve Data API (Replace API_KEY with your actual API key)
+      const response = await fetch(`https://api.twelvedata.com/price?symbol=${symbol}&apikey=YOUR_API_KEY`);
+  
+      if (!response.ok) throw new Error('Failed to fetch latest stock price');
+  
+      const data = await response.json();
+      const basePrice = data.price;
+  
+      if (!basePrice) throw new Error('Invalid stock data received');
+  
+      const orderData = {
+        Quantity: Number(quantity),
+        StockName: symbol,
+        basePrice: Number(basePrice),
+        stopLoss: Number(stopLoss),
+        uid: 'hbdsjfjsfsbdf', // Replace with actual user ID
+      };
+  
+      // Store the order in Firebase Firestore
+      const firestore = firebase.firestore();
+      await firestore.collection('orders').add(orderData);
+  
+      console.log('Order placed successfully:', orderData);
+    } catch (error) {
+      console.error('Error placing order:', error);
+      alert('Error placing order. Please try again later.');
+    }
+  
+    setShowBuyModal(false);
+    setQuantity('');
+    setStopLoss('');
   };
+  
   const executeSell = () => {
     if (!quantity) return alert('Please enter the quantity to sell');
     console.log(`Selling ${quantity} shares of ${symbol}`);
