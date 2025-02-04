@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Navbar from '../home/Components/navbar'; 
+
 
 export default function SearchBar() {
   const [query, setQuery] = useState("");
@@ -166,7 +168,7 @@ export default function SearchBar() {
           </div>
         </div>
       )}
-      
+
       {/* Display Backtrack API response */}
       {backtrackData && (
         <div className="border p-4 rounded-lg w-full max-w-lg bg-gray-100 text-black">
@@ -184,7 +186,7 @@ export default function SearchBar() {
       )}
 
       {/* Display Indicators API response */}
-    
+     <Navbar />
     </div>
   );
 }

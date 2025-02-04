@@ -1,8 +1,6 @@
 'use client';
 
-
 import { useState, useEffect, useRef } from 'react';
-
 import { useParams } from 'next/navigation';
 import Navbar from '../../home/Components/navbar';
 import dynamic from 'next/dynamic';
@@ -36,28 +34,25 @@ const StockPage = () => {
     }
   }, []);
 
-  // functioms for buying the values and storing in the db
-
-   
   const [showOptions, setShowOptions] = useState(false);
-const [result, setResult] = useState(null);
-const [sharpeRatio, setSharpeRatio] = useState(null);
+  const [result, setResult] = useState(null);
+  const [sharpeRatio, setSharpeRatio] = useState(null);
 
-const runBacktest = async () => {
-  const response = await fetch('/api/backtest');
-  const data = await response.json();
-  setResult(data);
-};
+  const runBacktest = async () => {
+    const response = await fetch('/api/backtest');
+    const data = await response.json();
+    setResult(data);
+  };
 
-const showFunctionCode = () => {
-  alert("Displaying function code...");
-};
+  const showFunctionCode = () => {
+    alert("Displaying function code...");
+  };
 
-const showResults = async () => {
-  const response = await fetch('/api/sharpe-ratio');
-  const data = await response.json();
-  setSharpeRatio(data.sharpeRatio);
-};
+  const showResults = async () => {
+    const response = await fetch('/api/sharpe-ratio');
+    const data = await response.json();
+    setSharpeRatio(data.sharpeRatio);
+  };
 
   const fetchStockData = async () => {
     try {
@@ -97,36 +92,52 @@ const showResults = async () => {
 
   const handleBuy = () => setShowBuyModal(true);
   const handleSell = () => setShowSellModal(true);
-  
+
   const executeBuy = async () => {
     if (!quantity || !stopLoss) {
       alert('Please enter both quantity and stop loss');
       return;
     }
-  
+
     try {
       const response = await fetch(`https://api.twelvedata.com/price?symbol=${symbol}&apikey=ab4969be7e034d59a46a75aa65c5dc26`);
       if (!response.ok) throw new Error('Failed to fetch latest stock price');
-  
+
       const data = await response.json();
       const basePrice = data.price;
       if (!basePrice) throw new Error('Invalid stock data received');
-  
+
       const user = auth.currentUser;
       if (!user) throw new Error('User not authenticated');
-  
+
       const userRef = doc(db, "users", user.uid);
       const stockQuery = query(collection(db, "orders"), where("uid", "==", user.uid), where("StockName", "==", symbol));
       const stockSnapshot = await getDocs(stockQuery);
-  
+
       if (!stockSnapshot.empty) {
         // Stock exists, update quantity
         const stockDoc = stockSnapshot.docs[0];
         const updatedQuantity = stockDoc.data().Quantity + Number(quantity);
-  
+
+        // Deduct the total value from the user's balance
+        const currentBalance = (await getDoc(userRef)).data().balance;
+        const totalPrice = basePrice * Number(quantity);
+        const updatedBalance = currentBalance - totalPrice;
+
+        // Check if the balance is sufficient
+        if (updatedBalance < 0) throw new Error('Insufficient funds to purchase the stock');
+
+        // Update user balance and stock quantity
         await updateDoc(stockDoc.ref, { Quantity: updatedQuantity });
+        await updateDoc(userRef, { balance: updatedBalance });
       } else {
         // Stock does not exist, create new entry
+        const totalPrice = basePrice * Number(quantity);
+
+        // Check if the balance is sufficient
+        const currentBalance = (await getDoc(userRef)).data().balance;
+        if (currentBalance < totalPrice) throw new Error('Insufficient funds to purchase the stock');
+
         await addDoc(collection(db, "orders"), {
           Quantity: Number(quantity),
           StockName: symbol,
@@ -134,46 +145,49 @@ const showResults = async () => {
           stopLoss: Number(stopLoss),
           uid: user.uid,
         });
+
+        // Deduct total value from user's balance
+        await updateDoc(userRef, { balance: currentBalance - totalPrice });
       }
-      
+
       console.log('Order placed successfully');
       alert('Order placed successfully');
     } catch (error) {
       console.error('Error placing order:', error);
       alert(error.message);
     }
-  
+
     setShowBuyModal(false);
     setQuantity('');
     setStopLoss('');
   };
-  
+
   const executeSell = async () => {
     if (!quantity) return alert('Please enter the quantity to sell');
-  
+
     try {
       const response = await fetch(`https://api.twelvedata.com/price?symbol=${symbol}&apikey=ab4969be7e034d59a46a75aa65c5dc26`);
       if (!response.ok) throw new Error('Failed to fetch latest stock price');
-  
+
       const data = await response.json();
       const basePrice = data.price;
       if (!basePrice) throw new Error('Invalid stock data received');
-  
+
       const user = auth.currentUser;
       if (!user) throw new Error('User not authenticated');
-  
+
       const userRef = doc(db, "users", user.uid);
       const stockQuery = query(collection(db, "orders"), where("uid", "==", user.uid), where("StockName", "==", symbol));
       const stockSnapshot = await getDocs(stockQuery);
-  
+
       if (stockSnapshot.empty) throw new Error('You do not own this stock');
-  
+
       const stockDoc = stockSnapshot.docs[0];
       const currentQuantity = stockDoc.data().Quantity;
       const sellQuantity = Number(quantity);
-  
+
       if (sellQuantity > currentQuantity) throw new Error('Not enough stock to sell');
-  
+
       if (sellQuantity === currentQuantity) {
         // If selling all, remove stock entry
         await deleteDoc(stockDoc.ref);
@@ -181,12 +195,12 @@ const showResults = async () => {
         // Otherwise, update quantity
         await updateDoc(stockDoc.ref, { Quantity: currentQuantity - sellQuantity });
       }
-  
+
       // Update user's balance
       const userSnap = await getDoc(userRef);
       const currentBalance = userSnap.exists() ? userSnap.data().balance : 0;
       const updatedBalance = currentBalance + (sellQuantity * basePrice);
-  
+
       await updateDoc(userRef, { balance: updatedBalance });
       alert('Stock sold successfully');
       console.log('Stock sold successfully');
@@ -194,11 +208,10 @@ const showResults = async () => {
       console.error('Error selling stock:', error);
       alert(error.message);
     }
-  
+
     setShowSellModal(false);
     setQuantity('');
   };
-  
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
@@ -214,44 +227,42 @@ const showResults = async () => {
         <div className="action-buttons">
           <button className="btn buy-btn" onClick={handleBuy}>Buy</button>
           <button className="btn sell-btn" onClick={handleSell}>Sell</button>
-          
-  {/* Options Menu */}
 
-    {/* Options Dropdown */}
-    <div className="dropdown">
-    <button
-      className="btn options-btn"
-      onClick={() => setShowOptions(!showOptions)}
-    >
-      Options ⌄
-    </button>
+          {/* Options Menu */}
+          <div className="dropdown">
+            <button
+              className="btn options-btn"
+              onClick={() => setShowOptions(!showOptions)}
+            >
+              Options ⌄
+            </button>
 
-    {showOptions && (
-      <div className="dropdown-menu">
-        <button className="dropdown-item" onClick={runBacktest}>
-          Run Backtest
-        </button>
-        <button className="dropdown-item" onClick={showFunctionCode}>
-          Show Function Code
-        </button>
-        <button className="dropdown-item" onClick={showResults}>
-          Show Sharpe Ratio
-        </button>
-      </div>
-    )}
-  </div>
+            {showOptions && (
+              <div className="dropdown-menu">
+                <button className="dropdown-item" onClick={runBacktest}>
+                  Run Backtest
+                </button>
+                <button className="dropdown-item" onClick={showFunctionCode}>
+                  Show Function Code
+                </button>
+                <button className="dropdown-item" onClick={showResults}>
+                  Show Sharpe Ratio
+                </button>
+              </div>
+            )}
+          </div>
 
-
-  {/* Display Result */}
-  {result && (
-    <div className="result-section">
-      <h4>Result:</h4>
-      <pre>{JSON.stringify(result, null, 2)}</pre>
-      <h4>Sharpe Ratio: {sharpeRatio}</h4>
-    </div>
-  )}
+          {/* Display Result */}
+          {result && (
+            <div className="result-section">
+              <h4>Result:</h4>
+              <pre>{JSON.stringify(result, null, 2)}</pre>
+              <h4>Sharpe Ratio: {sharpeRatio}</h4>
+            </div>
+          )}
         </div>
       </div>
+
       {(showBuyModal || showSellModal) && (
         <div className="modal-overlay">
           <div className="modal">
@@ -260,12 +271,33 @@ const showResults = async () => {
               <button className="close-btn" onClick={() => showBuyModal ? setShowBuyModal(false) : setShowSellModal(false)}>&times;</button>
             </div>
             <div className="modal-body">
-              <input type="number" placeholder="Quantity" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
-              {showBuyModal && <input type="number" placeholder="Stop Loss" value={stopLoss} onChange={(e) => setStopLoss(e.target.value)} />}
+              <label>Quantity: </label>
+              <input
+                type="number"
+                value={quantity}
+                onChange={(e) => setQuantity(e.target.value)}
+                placeholder="Enter quantity"
+              />
+              {showBuyModal && (
+                <>
+                  <label>Stop Loss: </label>
+                  <input
+                    type="number"
+                    value={stopLoss}
+                    onChange={(e) => setStopLoss(e.target.value)}
+                    placeholder="Enter stop loss"
+                  />
+                </>
+              )}
             </div>
             <div className="modal-footer">
               <button className="btn cancel-btn" onClick={() => showBuyModal ? setShowBuyModal(false) : setShowSellModal(false)}>Cancel</button>
-              <button className="btn confirm-btn" onClick={showBuyModal ? executeBuy : executeSell}>Confirm {showBuyModal ? 'Buy' : 'Sell'}</button>
+              <button
+                className="btn confirm-btn"
+                onClick={showBuyModal ? executeBuy : executeSell}
+              >
+                {showBuyModal ? 'Confirm Buy' : 'Confirm Sell'}
+              </button>
             </div>
           </div>
         </div>

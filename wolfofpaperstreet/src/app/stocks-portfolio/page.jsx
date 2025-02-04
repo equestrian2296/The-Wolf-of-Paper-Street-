@@ -1,38 +1,39 @@
 "use client";
 import React, { useState, useEffect } from "react";
-  // Import firebase configuration here
 import { collection, getDocs, query, where, doc, getDoc, getFirestore } from "firebase/firestore";
-import { app } from "../../../Firebase/firebase" // Import Firebase app
+import { app } from "../../../Firebase/firebase"; // Import Firebase app
 import { getAuth } from "firebase/auth";
+import Navbar from "../home/Components/navbar";
 
 const PortfolioPage = () => {
   const [portfolio, setPortfolio] = useState({
-    totalBalance: 15000,
+    totalBalance: 0, // Default value
     stocks: [],
     user: null,
   });
+  
   const auth = getAuth(app);
   const db = getFirestore(app);
-  const userUID =  auth.currentUser.uid;  // Replace with the actual UID of the logged-in user
-  const userDocRef = doc(db, "users", userUID);  // Reference to the user's document in the users collection
+  const userUID = auth.currentUser?.uid; // Ensure UID exists
 
-  // Fetching data from Firebase (user info and stock orders)
   useEffect(() => {
     const fetchPortfolioData = async () => {
+      if (!userUID) return; // Exit if no user is logged in
+      
       try {
-        // Fetch user data by document ID
+        const userDocRef = doc(db, "users", userUID);
         const userDocSnapshot = await getDoc(userDocRef);
+
         if (userDocSnapshot.exists()) {
           const userData = userDocSnapshot.data();
+          const userBalance = userData.balance || 0; // Get balance from Firestore
 
-          // Fetch orders (stocks data) related to the logged-in user
           const ordersRef = query(collection(db, "orders"), where("uid", "==", userUID));
           const ordersSnapshot = await getDocs(ordersRef);
 
           let stocksData = [];
           ordersSnapshot.forEach((doc) => {
             const data = doc.data();
-            // Add stock to portfolio
             stocksData.push({
               symbol: data.StockName,
               quantity: data.Quantity,
@@ -43,11 +44,11 @@ const PortfolioPage = () => {
             });
           });
 
-          setPortfolio((prevPortfolio) => ({
-            ...prevPortfolio,
+          setPortfolio({
+            totalBalance: userBalance,
             stocks: stocksData,
             user: userData,
-          }));
+          });
         } else {
           console.log("User document does not exist");
         }
@@ -57,25 +58,23 @@ const PortfolioPage = () => {
     };
 
     fetchPortfolioData();
-  }, []);
+  }, [userUID, db]);
 
-  // Function to simulate real-time price updates
   useEffect(() => {
     const interval = setInterval(() => {
       setPortfolio((prevPortfolio) => {
         const updatedStocks = prevPortfolio.stocks.map((stock) => ({
           ...stock,
-          currentPrice: (stock.currentPrice * (0.98 + Math.random() * 0.04)).toFixed(2), // Simulating small fluctuations
+          currentPrice: (stock.currentPrice * (0.98 + Math.random() * 0.04)).toFixed(2),
         }));
 
         return { ...prevPortfolio, stocks: updatedStocks };
       });
-    }, 120000); // Update every 2 minutes
+    }, 3000);
 
-    return () => clearInterval(interval); // Cleanup on unmount
+    return () => clearInterval(interval);
   }, []);
 
-  // Calculate total profit/loss
   const totalProfit = portfolio.stocks.reduce((acc, stock) => {
     return acc + stock.quantity * (stock.currentPrice - stock.thatTimeePrice);
   }, 0);
@@ -84,18 +83,12 @@ const PortfolioPage = () => {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto p-6">
         <h1 className="text-3xl font-bold mb-6 text-center text-black">📈 Stock Portfolio</h1>
-
-        {/* User Info Section */}
         {portfolio.user && (
           <div className="bg-white p-6 rounded-lg shadow-md mb-6 border">
             <h2 className="text-xl font-semibold text-black">👤 User Info</h2>
-            <p className="text-lg text-black mt-2">User ID: {portfolio.user.uid}</p>
-            <p className="text-lg text-black mt-2">User Name: {portfolio.user.name}</p> {/* Replace with actual field */}
-            {/* Add more user-related fields as needed */}
+            <p className="text-lg text-black mt-2">User Name: {portfolio.user.name}</p>
           </div>
         )}
-
-        {/* Portfolio Summary */}
         <div className="bg-white p-6 rounded-lg shadow-md mb-6 border">
           <p className="text-lg font-semibold text-black">
             💰 Total Balance:
@@ -108,8 +101,6 @@ const PortfolioPage = () => {
             </span>
           </p>
         </div>
-
-        {/* Stocks Table */}
         <div className="bg-white shadow-md rounded-lg p-6 border">
           <h2 className="text-2xl font-semibold mb-4 text-black">📜 Your Stocks (Real-Time Updates)</h2>
           {portfolio.stocks.length === 0 ? (
@@ -135,11 +126,7 @@ const PortfolioPage = () => {
                       <td className="border p-3">{stock.dataBrought}</td>
                       <td className="border p-3">${stock.thatTimeePrice.toFixed(2)}</td>
                       <td className="border p-3 font-bold text-blue-600">${stock.currentPrice}</td>
-                      <td
-                        className={`border p-3 font-bold ${
-                          stock.currentPrice - stock.thatTimeePrice >= 0 ? "text-green-700" : "text-red-600"
-                        }`}
-                      >
+                      <td className={`border p-3 font-bold ${stock.currentPrice - stock.thatTimeePrice >= 0 ? "text-green-700" : "text-red-600"}`}>
                         ${(stock.quantity * (stock.currentPrice - stock.thatTimeePrice)).toFixed(2)}
                       </td>
                     </tr>
@@ -150,6 +137,7 @@ const PortfolioPage = () => {
           )}
         </div>
       </div>
+      <Navbar />
     </div>
   );
 };

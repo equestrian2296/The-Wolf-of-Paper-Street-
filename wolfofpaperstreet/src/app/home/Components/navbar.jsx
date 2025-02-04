@@ -44,8 +44,8 @@ const navbar = ({ position = "bottom" }) => {
 
       <div className={`radial-menu ${open ? "open" : ""}`}>
         <button className="menu-item" onClick={() => router.push("/")} aria-label="Home">🏠</button>
-        <button className="menu-item" onClick={() => router.push("/usa-market")} aria-label="USA Market">🇺🇸</button>
-        <button className="menu-item" onClick={() => router.push("/indian-stocks")} aria-label="Indian Stocks">🇮🇳</button>
+        <button className="menu-item" onClick={() => router.push("/stocks")} aria-label="USA Market">🇺🇸</button>
+        <button className="menu-item" onClick={() => router.push("/stocks")} aria-label="Indian Stocks">🇮🇳</button>
         <button className="menu-item" onClick={() => router.push("/news")} aria-label="News">📰</button>
         <button className="menu-item profile" ref={profileRef} onClick={toggleProfile} aria-label="Profile">👤</button>
       </div>
