@@ -1,52 +1,51 @@
 .stock-scroller {
-    overflow: hidden;
-    padding: 1rem;
-    display: flex;
-    flex-direction: row;
-    border-radius: 0.5rem;
-    height: 100px;
-    width: 95vw;
-   
-  }
-  
-  .stock-container {
-    display: flex;
-    flex-direction: row;
-    gap: 1rem;
-    padding: 1rem;
-    border-radius: 0.5rem;
-  }
-  
-  .stock-item {
-    height: 60px;
-    display: flex;
-    align-items: center;
-    color: black;
-    border-radius: 0.5rem;
-    margin-right: 1.5rem;
-    padding: 20px;
-   
-  }
-  
-  .stock-name {
-    font-weight: 600;
-    color: black;
-  }
-  
-  .stock-value {
-    margin-left: 0.5rem;
-    color: #6b7280;
-  }
-  
-  .stock-change {
-    margin-left: 0.5rem;
-  }
-  
-  .stock-change.negative {
-    color: #ef4444;
-  }
-  
-  .stock-change.positive {
-    color: #10b981;
-  }
-  
+  overflow: hidden;
+  padding: 1rem;
+  display: flex;
+  flex-direction: row;
+  border-radius: 0.5rem;
+  height: 100px;
+  width: 95vw;
+ 
+}
+
+.stock-container {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
+.stock-item {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  color: black;
+  border-radius: 0.5rem;
+  margin-right: 1.5rem;
+  padding: 20px;
+ 
+}
+
+.stock-name {
+  font-weight: 600;
+  color: black;
+}
+
+.stock-value {
+  margin-left: 0.5rem;
+  color: #6b7280;
+}
+
+.stock-change {
+  margin-left: 0.5rem;
+}
+
+.stock-change.negative {
+  color: #ef4444;
+}
+
+.stock-change.positive {
+  color: #10b981;
+}

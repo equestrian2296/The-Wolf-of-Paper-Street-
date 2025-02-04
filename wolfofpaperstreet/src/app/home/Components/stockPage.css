@@ -1,202 +1,201 @@
 .stock-page {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-  }
-  
-  .stock-content {
-    flex: 1;
-    padding: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-  
-  .chart-container {
-    margin-bottom: 20px;
-  }
-  
-  .action-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-  }
-  
-  .btn {
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    border: none;
-    border-radius: 5px;
-    transition: background-color 0.3s, transform 0.1s;
-  }
-  
-  .btn:active {
-    transform: scale(0.98);
-  }
-  
-  .buy-btn {
-    background-color: #4CAF50;
-    color: white;
-  }
-  
-  .sell-btn {
-    background-color: #f44336;
-    color: white;
-  }
-  
-  .buy-btn:hover {
-    background-color: #45a049;
-  }
-  
-  .sell-btn:hover {
-    background-color: #da190b;
-  }
-  
-  .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .modal {
-    background-color: white;
-    border-radius: 8px;
-    width: 90%;
-    max-width: 500px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  
-  .modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 20px;
-    border-bottom: 1px solid #e0e0e0;
-  }
-  
-  .modal-header h2 {
-    margin: 0;
-    font-size: 20px;
-  }
-  
-  .close-btn {
-    background: none;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-    color: #888;
-  }
-  
-  .modal-body {
-    padding: 20px;
-  }
-  
-  .modal-body input {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 16px;
-  }
-  
-  .modal-footer {
-    display: flex;
-    justify-content: flex-end;
-    padding: 15px 20px;
-    border-top: 1px solid #e0e0e0;
-  }
-  
-  .modal-footer .btn {
-    margin-left: 10px;
-  }
-  
-  .cancel-btn {
-    background-color: #e0e0e0;
-    color: #333;
-  }
-  
-  .confirm-btn {
-    background-color: #2196F3;
-    color: white;
-  }
-  
-  .cancel-btn:hover {
-    background-color: #d0d0d0;
-  }
-  
-  .confirm-btn:hover {
-    background-color: #1976D2;
-  }
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.stock-content {
+  flex: 1;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.chart-container {
+  margin-bottom: 20px;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.btn {
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  transition: background-color 0.3s, transform 0.1s;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.buy-btn {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.sell-btn {
+  background-color: #f44336;
+  color: white;
+}
+
+.buy-btn:hover {
+  background-color: #45a049;
+}
+
+.sell-btn:hover {
+  background-color: #da190b;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal {
+  background-color: white;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #888;
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.modal-body input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 15px 20px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.modal-footer .btn {
+  margin-left: 10px;
+}
+
+.cancel-btn {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+.confirm-btn {
+  background-color: #2196F3;
+  color: white;
+}
+
+.cancel-btn:hover {
+  background-color: #d0d0d0;
+}
+
+.confirm-btn:hover {
+  background-color: #1976D2;
+}
 
 
-  .options-menu {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 10px;
-  }
-  
-  .option-item {
-    background: #007bff;
-    color: rgb(16, 15, 15);
-    padding: 8px 12px;
-    border: none;
-    cursor: pointer;
-  }
-  
-  .result-section {
-    margin-top: 15px;
-    padding: 10px;
-    background: #f8f9fa;
-  }
-  
-  
+.options-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
 
-  .dropdown {
-    position: relative;
-    display: inline-block;
-  }
-  
-  .options-btn {
-    background-color: #007bff;
-    color: rgb(11, 11, 11);
-    border: none;
-    padding: 8px 12px;
-    cursor: pointer;
-    border-radius: 5px;
-  }
-  
-  .dropdown-menu {
-    position: absolute;
-    bottom: 100%;
-    left: 0;
-    background: white;
-    border: 1px solid #ddd;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    z-index: 9999;
-    width: 180px;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .dropdown-item {
-    padding: 10px;
-    border: none;
-    background: none;
-    color: black;
-    text-align: left;
-    cursor: pointer;
-    width: 100%;
-  }
-  
-  .dropdown-item:hover {
-    background: #f2f2f2;
-  }
-  
+.option-item {
+  background: #007bff;
+  color: rgb(16, 15, 15);
+  padding: 8px 12px;
+  border: none;
+  cursor: pointer;
+}
+
+.result-section {
+  margin-top: 15px;
+  padding: 10px;
+  background: #f8f9fa;
+}
+
+
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.options-btn {
+  background-color: #007bff;
+  color: rgb(11, 11, 11);
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.dropdown-menu {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  background: white;
+  border: 1px solid #ddd;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 9999;
+  width: 180px;
+  display: flex;
+  flex-direction: column;
+}
+
+.dropdown-item {
+  padding: 10px;
+  border: none;
+  background: none;
+  color: black;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+}
+
+.dropdown-item:hover {
+  background: #f2f2f2;
+}

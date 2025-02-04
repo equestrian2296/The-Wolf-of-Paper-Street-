@@ -1,68 +1,42 @@
-/* General Container Styling */
-.stock-container {
-    display: flex;
-    justify-content: space-between;
-    padding: 20px;
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  /* Section Styling */
-  .growth-section, .drop-section {
-    width: 48%;
-  }
-  
-  /* Header Styling */
-  h2 {
-    font-size: 1.5rem;
-    margin-bottom: 15px;
-    color: #343a40;
-    border-bottom: 2px solid #dee2e6;
-    padding-bottom: 5px;
-  }
-  
-  /* Stock Item Styling */
-  .stock-item {
+.stock-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 10px;
-    margin-bottom: 10px;
-    background-color: #ffffff;
-    border: 1px solid #dee2e6;
+    border-bottom: 1px solid #ddd;
+    flex-wrap: wrap; /* Allow items to wrap to fit better */
+  }
+  
+  .stock-name {
+    flex: 2 1 150px; /* Allow it to grow but maintain a minimum width */
+    font-weight: bold;
+    word-wrap: break-word; /* Ensure long names wrap properly */
+  }
+  
+  .stock-symbol {
+    flex: 1 1 100px; /* Allow it to grow but maintain a minimum width */
+    background-color: #f0f0f0;
+    padding: 5px 10px;
     border-radius: 5px;
+    text-align: center;
   }
   
-  /* Positive and Negative Indicators */
-  .stock-item .positive {
-    color: #28a745; /* Green for growth */
+  .stock-price {
+    flex: 1 1 100px; /* Allow it to grow but maintain a minimum width */
+    font-weight: bold;
+    text-align: right;
   }
   
-  .stock-item .negative {
-    color: #dc3545; /* Red for drop */
+  .stock-change {
+    flex: 1 1 100px; /* Allow it to grow but maintain a minimum width */
+    text-align: right;
   }
   
-  /* Link Styling */
-  a {
-    display: block;
-    margin-top: 15px;
-    color: #007bff;
-    text-decoration: none;
+  .stock-change.positive {
+    color: green;
   }
   
-  a:hover {
-    text-decoration: underline;
-  }
-  
-  /* Responsive Design */
-  @media (max-width: 768px) {
-    .stock-container {
-      flex-direction: column;
-    }
-  
-    .growth-section, .drop-section {
-      width: 100%;
-    }
+  .stock-change.negative {
+    color: red;
   }
   

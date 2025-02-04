@@ -1,7 +1,7 @@
 "use client"; // Mark this as a client component
 
 import React, { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation"; // For redirection in Next.js
+import { useRouter } from "next/navigation";
 import "./navbar.css";
 
 const navbar = ({ position = "bottom" }) => {
@@ -10,15 +10,9 @@ const navbar = ({ position = "bottom" }) => {
   const profileRef = useRef(null);
   const router = useRouter();
 
-  const toggleMenu = () => {
-    setOpen((prev) => !prev);
-  };
+  const toggleMenu = () => setOpen((prev) => !prev);
+  const toggleProfile = () => setIsProfileOpen((prev) => !prev);
 
-  const toggleProfile = () => {
-    setIsProfileOpen((prev) => !prev);
-  };
-
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (profileRef.current && !profileRef.current.contains(event.target)) {
@@ -27,47 +21,49 @@ const navbar = ({ position = "bottom" }) => {
     };
 
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Logout function
   const handleLogout = () => {
+    console.log("Logging out...");
+
     localStorage.removeItem("authToken");
     localStorage.removeItem("user");
-    router.push("/landing");
+
+    setIsProfileOpen(false); // Ensure dropdown closes
+    setTimeout(() => {
+      router.push("/landing"); // Redirect to landing page after logout
+    }, 100);
   };
 
-  // Effect to add/remove blur class on body
-  useEffect(() => {
-    if (open) {
-      document.body.classList.add("blur");
-    } else {
-      document.body.classList.remove("blur");
-    }
-  }, [open]);
-
   return (
-    <div className={`radial-container ${position}`}>
-      <button className="menu-button" onClick={toggleMenu}>
-        🐺 {/* Wolf emoji */}
+    <nav className={`radial-container ${position}`}>
+      <button className="menu-button" onClick={toggleMenu} aria-label="Toggle Menu">
+        🐺
       </button>
+
       <div className={`radial-menu ${open ? "open" : ""}`}>
-        <div className="menu-item" onClick={() => router.push("/")}>🏠</div>
-        <div className="menu-item" onClick={() => router.push("/usa-market")}>🇺🇸</div>
-        <div className="menu-item" onClick={() => router.push("/indian-stocks")}>🇮🇳</div>
-        <div className="menu-item" onClick={() => router.push("/news")}>📰</div>
-        <div className="menu-item profile" ref={profileRef} onClick={toggleProfile}>👤</div>
+        <button className="menu-item" onClick={() => router.push("/")} aria-label="Home">🏠</button>
+        <button className="menu-item" onClick={() => router.push("/usa-market")} aria-label="USA Market">🇺🇸</button>
+        <button className="menu-item" onClick={() => router.push("/indian-stocks")} aria-label="Indian Stocks">🇮🇳</button>
+        <button className="menu-item" onClick={() => router.push("/news")} aria-label="News">📰</button>
+        <button className="menu-item profile" ref={profileRef} onClick={toggleProfile} aria-label="Profile">👤</button>
       </div>
+
       {isProfileOpen && (
-        <div className="profile-dropdown">
-          <button className="logout-button" onClick={handleLogout}>Logout</button>
-          <a href="/user-details">User  Details</a>
-          <a href="/stocks-portfolio">Stocks Portfolio</a>
+        <div className="profile-dropdown" ref={profileRef}>
+          <button className="dropdown-item" onClick={handleLogout}>Logout</button>
+          <button className="dropdown-item" onClick={() => {
+            setIsProfileOpen(false);
+            router.push("/user-details");
+          }}>User Details</button>
+          <button className="dropdown-item" onClick={() => {
+            setIsProfileOpen(false);
+            router.push("/stocks-portfolio");
+          }}>Stocks Portfolio</button>
         </div>
       )}
-    </div>
+    </nav>
   );
 };
 

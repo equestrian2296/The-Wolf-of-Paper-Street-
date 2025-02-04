@@ -43,7 +43,7 @@ const HomePage = () => {
 
           {/* User Profile - Resized */}
           <div className="bg-gray-800 p-6 rounded-lg border-2 border-yellow-400 shadow-lg flex flex-col items-center w-full max-w-xs mx-auto">
-            <img src={userData.avatar} alt="User  Avatar" className="rounded-full w-16" />
+            <img src={userData.avatar} alt="User Avatar" className="rounded-full w-16" />
             <h2 className="mt-2">{userData.name}</h2>
             <p className="text-green-400">Balance: ${userData.balance}</p>
           </div>
@@ -64,9 +64,12 @@ const HomePage = () => {
 
         {/* Floating Buttons */}
         <div className="fixed bottom-24 left-10 right-10 flex justify-between">
-          <button className="bg-purple-600 text-white px-5 py-3 rounded-lg shadow-lg border-2 border-purple-400 hover:bg-purple-800">
-            Trade in Past
-          </button>
+          {/* Updated button */}
+          <Link href="/backtest">
+            <button className="bg-purple-600 text-white px-5 py-3 rounded-lg shadow-lg border-2 border-purple-400 hover:bg-purple-800">
+              Trade in Past
+            </button>
+          </Link>
           <Link href="/stock/AAPL">
             <button className="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg border-2 border-green-400 hover:bg-green-700">
               Go Trade
