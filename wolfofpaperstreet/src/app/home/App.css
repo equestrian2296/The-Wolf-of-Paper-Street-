@@ -12,15 +12,15 @@
     display: flex;
     flex-direction: column;  /* Arrange the components side by side */
     width: 100%; /* Ensure it takes the full width */
-    max-width: 1200px; /* Optional: Limit the max width of the content */
+    max-width: 100vw; /* Optional: Limit the max width of the content */
     margin-top: 10px;
   }
   
   .stock-list-container,
   .stock-scroller-container {
-    flex: 1;  /* Make both sections take up equal width */
-    margin: 10px;
-    padding: 10px;
+/* Make both sections take up equal width */
+    margin: 5px;
+    padding: 1px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   }

@@ -11,14 +11,15 @@ function homePage() {
       <Navbar /> {/* Navbar stays at the top */}
       
       <div className="main-content">
+      <div className="stock-scroller-container">
+          <StockScroller /> {/* Stock scroller component */}
+        </div>
         <div className="stock-list-container">
           <StockList /> {/* Stock list component */}
         </div>
         
-        <div className="stock-scroller-container">
-          <StockScroller /> {/* Stock scroller component */}
-        </div>
-        <Link href="/stock/AAPL" >Login</Link> {/* Login link */}
+       
+        <Link href="/stock/AAPL" > View Charts and Buy Page</Link> {/* Login link */}
       </div>
     </div>
   );

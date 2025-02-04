@@ -1,23 +1,43 @@
-"use client"; // Ensure this is a client component in Next.js
+"use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import "./home.css";
 
-const stockData = [
-  { name: "Nifty 50", value: "23,361.05 INR", change: "-0.52%" },
-  { name: "Sensex", value: "77,194.41 INR", change: "-0.40%" },
-  { name: "BSE LargeCap", value: "8,980.83 INR", change: "-0.65%" },
-  { name: "BSE MidCap", value: "42,515.64 INR", change: "-0.86%" },
+const generateRandomStockData = () => [
+  { name: "Nifty 50", value: getRandomStockValue(23000, 24000), change: getRandomChange() },
+  { name: "Sensex", value: getRandomStockValue(76000, 78000), change: getRandomChange() },
+  { name: "BSE LargeCap", value: getRandomStockValue(8500, 9500), change: getRandomChange() },
+  { name: "BSE MidCap", value: getRandomStockValue(41000, 43000), change: getRandomChange() },
 ];
 
+const getRandomStockValue = (min, max) =>
+  `${(Math.random() * (max - min) + min).toFixed(2)} INR`;
+
+const getRandomChange = () => {
+  const change = (Math.random() * 2 - 1).toFixed(2);
+  return `${change > 0 ? "+" : ""}${change}%`;
+};
+
 const StockScroller = () => {
+  const [stockData, setStockData] = useState(generateRandomStockData());
+  const router = useRouter();
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setStockData(generateRandomStockData());
+    }, 5000); // Update every 5 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="stock-scroller">
       <motion.div
         className="stock-container"
         animate={{
-          x: [0, -1000], // Adjusted for a smoother infinite loop
+          x: [0, -1000], // Continuous scrolling
         }}
         transition={{
           repeat: Infinity,
@@ -26,24 +46,20 @@ const StockScroller = () => {
           ease: "linear",
         }}
       >
-         <div>
-      {[...stockData, ...stockData].map((stock, index) => (
-          <div key={index} className="stock-item">
+        {[...stockData, ...stockData].map((stock, index) => (
+          <div
+            key={index}
+            className="stock-item"
+            onClick={() => router.push(`/stock/${stock.name.replace(/\s+/g, "").toLowerCase()}`)}
+          >
             <span className="stock-name">{stock.name}</span>
             <span className="stock-value">{stock.value}</span>
-            <span
-              className={`stock-change ${
-                stock.change.includes("-") ? "negative" : "positive"
-              }`}
-            >
+            <span className={`stock-change ${stock.change.includes("-") ? "negative" : "positive"}`}>
               {stock.change}
             </span>
           </div>
         ))}
-      </div>
-        
       </motion.div>
-     
     </div>
   );
 };
