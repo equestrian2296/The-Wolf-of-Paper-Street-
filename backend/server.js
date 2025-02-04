@@ -4,6 +4,8 @@ const cors = require('cors');
 const fetchStockData = require('./yahooFinance');
 const yahooFinance = require('yahoo-finance2').default;
 const { RSI, SMA, EMA } = require("technicalindicators");
+const ModelClient = require("@azure-rest/ai-inference").default;
+const { AzureKeyCredential } = require("@azure/core-auth");
 const app = express();
 
 app.use(cors());
@@ -283,7 +285,7 @@ app.get("/indicators", async (req, res) => {
 
 const openai = new OpenAI({
   baseURL: "https://models.inference.ai.azure.com",
-  apiKey: process.env.OPENAI_API_KEY
+  apiKey: "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"
 });
 
 
@@ -338,6 +340,48 @@ app.post("/analyze", async (req, res) => {
       res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+
+
+// meta AI analyse
+const client = new ModelClient(
+    "https://models.inference.ai.azure.com",
+    new AzureKeyCredential("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")
+);
+
+
+app.post("/analyzemeta", async (req, res) => {
+    try {
+        const { content } = req.body;
+        if (!content) {
+            return res.status(400).json({ error: "Content is required" });
+        }
+
+        const response = await client.path("/chat/completions").post({
+            body: {
+                messages: [
+                    { role: "system", content: "Analyze if the user should buy the mentioned product. Respond with 'Buy it' or 'Don't buy it' with reasoning." },
+                    { role: "user", content }
+                ],
+                model: "Llama-3.3-70B-Instruct",
+                temperature: 0.8,
+                max_tokens: 2048,
+                top_p: 0.1
+            }
+        });
+
+        if (response.status !== "200") {
+            throw response.body.error;
+        }
+
+        res.json({ recommendation: response.body.choices[0].message.content });
+    } catch (error) {
+        res.status(500).json({ error: error.message || "Internal Server Error" });
+    }
+});
+
+
+
 
 
 app.listen(port, () => {
