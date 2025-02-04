@@ -278,15 +278,12 @@ app.get("/indicators", async (req, res) => {
 });
 
 
-
-
 // AI naaylze 
 const OPENAI_API_KEY = "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";
-const PERPLEXITY_API_KEY = process.env.PERPLEXITY_API_KEY;
-const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
+
 const openai = new OpenAI({
   baseURL: "https://models.inference.ai.azure.com",
-  apiKey: OPENAI_API_KEY
+  apiKey: process.env.OPENAI_API_KEY
 });
 
 
@@ -312,7 +309,7 @@ app.post("/analyze", async (req, res) => {
 
       // 2️⃣ Send Data to OpenAI for Analysis
       const prompt = `
-          You are a stock trading assistant. Based on the following real-time stock data, provide a recommendation on whether it's a good buying opportunity:
+          You are a stock trading assistant. Based on the following real-time stock data, provide a recommendation on whether it's a good buying opportunity and also give me score out of 100:
           - Stock Symbol: ${stockSymbol}
           - Current Price: $${regularMarketPrice}
           - 50-Day Moving Average: $${fiftyDayAverage}
