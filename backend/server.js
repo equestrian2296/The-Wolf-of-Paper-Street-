@@ -279,7 +279,7 @@ app.get("/indicators", async (req, res) => {
 
 
 // AI naaylze 
-const OPENAI_API_KEY = "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";
+
 
 const openai = new OpenAI({
   baseURL: "https://models.inference.ai.azure.com",
