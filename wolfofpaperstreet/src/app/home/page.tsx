@@ -5,6 +5,7 @@ import "./App.css";
 import StockList from "./Components/stocklist";
 import Link from "next/link";
 
+import YouTubeCarousel from "./Components/YoutubeCarsouel";
 function homePage() {
   return (
     <div className="app-container">
@@ -17,6 +18,8 @@ function homePage() {
         <div className="stock-list-container">
           <StockList /> {/* Stock list component */}
         </div>
+        <h1> Reccomendeed Videos for watching</h1>
+        <YouTubeCarousel />
         
        
         <Link href="/stock/AAPL" > View Charts and Buy Page</Link> {/* Login link */}
