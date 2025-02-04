@@ -282,71 +282,100 @@ app.get("/indicators", async (req, res) => {
 
 // AI naaylze 
 
+// AI naaylze 
+
 
 const openai = new OpenAI({
-  baseURL: "https://models.inference.ai.azure.com",
-  apiKey: "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"
-});
-
-
-// 🔥 API Endpoint for Stock Analysis
-app.post("/analyze", async (req, res) => {
-  try {
-      const { stockSymbol } = req.body; // Expecting { "stockSymbol": "AAPL" }
-
-      if (!stockSymbol) {
-          return res.status(400).json({ error: "Stock symbol is required" });
+    baseURL: "https://models.inference.ai.azure.com",
+    apiKey: "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"
+  });
+  
+  
+  // 🔥 API Endpoint for Stock Analysis
+  //app.post("/analyze", async (req, res) => {
+  //	try {
+  //		const { stockSymbol } = req.body; // Expecting { "stockSymbol": "AAPL" }
+  //
+  //		if (!stockSymbol) {
+  //			return res.status(400).json({ error: "Stock symbol is required" });
+  //		}
+  //
+  //		// 1️⃣ Fetch Real-Time Stock Data
+  //		const stockData = await yahooFinance.quoteSummary(stockSymbol, { modules: ["price", "summaryDetail"] });
+  //
+  //		if (!stockData || !stockData.price) {
+  //			return res.status(404).json({ error: "Stock data not found" });
+  //		}
+  //
+  //		// Extract relevant stock info
+  //		const { regularMarketPrice, marketCap, fiftyDayAverage, twoHundredDayAverage } = stockData.price;
+  //		const { forwardPE, dividendYield } = stockData.summaryDetail;
+  //
+  //		// 2️⃣ Send Data to OpenAI for Analysis
+  //		const prompt = `
+  //		  You are a stock trading assistant. Based on the following real-time stock data, provide a recommendation on whether it's a good buying opportunity and also give me score out of 100:
+  //		  - Stock Symbol: ${stockSymbol}
+  //		  - Current Price: $${regularMarketPrice}
+  //		  - 50-Day Moving Average: $${fiftyDayAverage}
+  //		  - 200-Day Moving Average: $${twoHundredDayAverage}
+  //		  - Forward P/E Ratio: ${forwardPE}
+  //		  - Market Cap: ${marketCap}
+  //		  - Dividend Yield: ${dividendYield ? dividendYield * 100 + "%" : "N/A"}
+  //	  `;
+  //
+  //		const response = await openai.chat.completions.create({
+  //			model: "gpt-4o",
+  //			messages: [
+  //				{ role: "system", content: "Analyze the stock data and provide a buy/sell recommendation." },
+  //				{ role: "user", content: prompt },
+  //			],
+  //			temperature: 0.7,
+  //			max_tokens: 200,
+  //			top_p: 1,
+  //		});
+  //
+  //		const recommendation = response.choices[0].message.content;
+  //		res.json({ stockSymbol, recommendation });
+  //
+  //	} catch (error) {
+  //		console.error("Error:", error);
+  //		res.status(500).json({ error: "Internal Server Error" });
+  //	}
+  //});
+  
+  
+  app.post("/analyze", async (req, res) => {
+      try {
+          const { content } = req.body;
+          if (!content) {
+              return res.status(400).json({ error: "Content is required" });
+          }
+  
+          const response = await openai.chat.completions.create({
+              model: "gpt-4o",
+              messages: [
+                  { "role": "system", content: "Analyze if the user should buy the mentioned product. Respond with a json object(as plain text not markdown) with field 'recommendation' with value as either 'Buy it' or 'Don't buy it' and another field 'reasoning' with the reasoning.", },
+                  { "role": "user", content: content, },
+              ],
+              temperature: 0.7,
+              max_tokens: 200,
+              top_p: 1,
+          });
+  
+          res.json(JSON.parse(response.choices[0].message.content));
+      } 
+      catch (error) {
+          console.log(error.message || "Internal Server Error");
+          res.status(500).json({ error: error.message || "Internal Server Error" });
       }
-
-      // 1️⃣ Fetch Real-Time Stock Data
-      const stockData = await yahooFinance.quoteSummary(stockSymbol, { modules: ["price", "summaryDetail"] });
-
-      if (!stockData || !stockData.price) {
-          return res.status(404).json({ error: "Stock data not found" });
-      }
-
-      // Extract relevant stock info
-      const { regularMarketPrice, marketCap, fiftyDayAverage, twoHundredDayAverage } = stockData.price;
-      const { forwardPE, dividendYield } = stockData.summaryDetail;
-
-      // 2️⃣ Send Data to OpenAI for Analysis
-      const prompt = `
-          You are a stock trading assistant. Based on the following real-time stock data, provide a recommendation on whether it's a good buying opportunity and also give me score out of 100:
-          - Stock Symbol: ${stockSymbol}
-          - Current Price: $${regularMarketPrice}
-          - 50-Day Moving Average: $${fiftyDayAverage}
-          - 200-Day Moving Average: $${twoHundredDayAverage}
-          - Forward P/E Ratio: ${forwardPE}
-          - Market Cap: ${marketCap}
-          - Dividend Yield: ${dividendYield ? dividendYield * 100 + "%" : "N/A"}
-      `;
-
-      const response = await openai.chat.completions.create({
-          model: "gpt-4o",
-          messages: [
-              { role: "system", content: "Analyze the stock data and provide a buy/sell recommendation." },
-              { role: "user", content: prompt },
-          ],
-          temperature: 0.7,
-          max_tokens: 200,
-          top_p: 1,
-      });
-
-      const recommendation = response.choices[0].message.content;
-      res.json({ stockSymbol, recommendation });
-
-  } catch (error) {
-      console.error("Error:", error);
-      res.status(500).json({ error: "Internal Server Error" });
-  }
-});
-
-
-
+  
+  });
+  
+  
 // meta AI analyse
 const client = new ModelClient(
     "https://models.inference.ai.azure.com",
-    new AzureKeyCredential("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")
+    new AzureKeyCredential("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")
 );
 
 
@@ -360,7 +389,7 @@ app.post("/analyzemeta", async (req, res) => {
         const response = await client.path("/chat/completions").post({
             body: {
                 messages: [
-                    { role: "system", content: "Analyze if the user should buy the mentioned product. Respond with 'Buy it' or 'Don't buy it' with reasoning." },
+                    { role: "system", content: "Analyze if the user should buy the mentioned product. Respond with a json object(as plain text not markdown) with field 'recommendation' with value as either 'Buy it' or 'Don't buy it' and another field 'reasoning' with the reasoning." },
                     { role: "user", content }
                 ],
                 model: "Llama-3.3-70B-Instruct",
@@ -374,7 +403,7 @@ app.post("/analyzemeta", async (req, res) => {
             throw response.body.error;
         }
 
-        res.json({ recommendation: response.body.choices[0].message.content });
+        res.json(JSON.parse(response.body.choices[0].message.content));
     } catch (error) {
         res.status(500).json({ error: error.message || "Internal Server Error" });
     }

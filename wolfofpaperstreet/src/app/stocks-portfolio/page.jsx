@@ -1,16 +1,63 @@
 "use client";
 import React, { useState, useEffect } from "react";
+  // Import firebase configuration here
+import { collection, getDocs, query, where, doc, getDoc, getFirestore } from "firebase/firestore";
+import { app } from "../../../Firebase/firebase" // Import Firebase app
+import { getAuth } from "firebase/auth";
 
 const PortfolioPage = () => {
-  // Hardcoded portfolio data with purchase details
   const [portfolio, setPortfolio] = useState({
     totalBalance: 15000,
-    stocks: [
-      { symbol: "AAPL", quantity: 10, dataBrought: "2024-01-05", thatTimeePrice: 175, currentPrice: 175 },
-      { symbol: "TSLA", quantity: 5, dataBrought: "2024-02-10", thatTimeePrice: 190, currentPrice: 190 },
-      { symbol: "GOOGL", quantity: 3, dataBrought: "2024-03-15", thatTimeePrice: 1290, currentPrice: 1290 },
-    ],
+    stocks: [],
+    user: null,
   });
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+  const userUID =  auth.currentUser.uid;  // Replace with the actual UID of the logged-in user
+  const userDocRef = doc(db, "users", userUID);  // Reference to the user's document in the users collection
+
+  // Fetching data from Firebase (user info and stock orders)
+  useEffect(() => {
+    const fetchPortfolioData = async () => {
+      try {
+        // Fetch user data by document ID
+        const userDocSnapshot = await getDoc(userDocRef);
+        if (userDocSnapshot.exists()) {
+          const userData = userDocSnapshot.data();
+
+          // Fetch orders (stocks data) related to the logged-in user
+          const ordersRef = query(collection(db, "orders"), where("uid", "==", userUID));
+          const ordersSnapshot = await getDocs(ordersRef);
+
+          let stocksData = [];
+          ordersSnapshot.forEach((doc) => {
+            const data = doc.data();
+            // Add stock to portfolio
+            stocksData.push({
+              symbol: data.StockName,
+              quantity: data.Quantity,
+              dataBrought: "2024-01-05", // Replace with actual purchase date if available
+              thatTimeePrice: parseFloat(data.basePrice),
+              currentPrice: parseFloat(data.basePrice), // Initially set to basePrice
+              stopLoss: data.stopLoss,
+            });
+          });
+
+          setPortfolio((prevPortfolio) => ({
+            ...prevPortfolio,
+            stocks: stocksData,
+            user: userData,
+          }));
+        } else {
+          console.log("User document does not exist");
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchPortfolioData();
+  }, []);
 
   // Function to simulate real-time price updates
   useEffect(() => {
@@ -23,7 +70,7 @@ const PortfolioPage = () => {
 
         return { ...prevPortfolio, stocks: updatedStocks };
       });
-    }, 3000); // Update every 3 seconds
+    }, 120000); // Update every 2 minutes
 
     return () => clearInterval(interval); // Cleanup on unmount
   }, []);
@@ -37,6 +84,16 @@ const PortfolioPage = () => {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto p-6">
         <h1 className="text-3xl font-bold mb-6 text-center text-black">📈 Stock Portfolio</h1>
+
+        {/* User Info Section */}
+        {portfolio.user && (
+          <div className="bg-white p-6 rounded-lg shadow-md mb-6 border">
+            <h2 className="text-xl font-semibold text-black">👤 User Info</h2>
+            <p className="text-lg text-black mt-2">User ID: {portfolio.user.uid}</p>
+            <p className="text-lg text-black mt-2">User Name: {portfolio.user.name}</p> {/* Replace with actual field */}
+            {/* Add more user-related fields as needed */}
+          </div>
+        )}
 
         {/* Portfolio Summary */}
         <div className="bg-white p-6 rounded-lg shadow-md mb-6 border">
