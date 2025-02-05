@@ -199,3 +199,8 @@
 .dropdown-item:hover {
   background: #f2f2f2;
 }
+
+
+input {
+  color: black;
+}

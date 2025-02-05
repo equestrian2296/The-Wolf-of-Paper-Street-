@@ -1,5 +1,5 @@
 'use client';
-
+import React from 'react';
 import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import Navbar from '../../home/Components/navbar';
@@ -33,6 +33,37 @@ const StockPage = () => {
       hasFetched.current = true;
     }
   }, []);
+
+  const [currentPrice, setCurrentPrice] = useState(null);
+
+  useEffect(() => {
+    const fetchCurrentPrice = async () => {
+      try {
+        // First time, fetch from API
+        if (currentPrice === null) {
+          const response = await fetch(`https://api.twelvedata.com/price?symbol=${symbol}&apikey=ab4969be7e034d59a46a75aa65c5dc26`);
+          if (!response.ok) throw new Error('Failed to fetch current stock price');
+          const data = await response.json();
+          setCurrentPrice(parseFloat(data.price));
+        } else {
+          // Subsequent updates: simulate price changes
+          const change = (Math.random() - 0.5) * 2; // Random change between -1 and 1
+          setCurrentPrice(prevPrice => parseFloat((prevPrice + change).toFixed(2)));
+        }
+      } catch (error) {
+        console.error('Error updating price:', error);
+      }
+    };
+  
+    fetchCurrentPrice();
+    const interval = setInterval(fetchCurrentPrice, 60000); // Update every minute
+  
+    return () => clearInterval(interval);
+  }, [symbol, currentPrice]);
+  
+
+
+
 
   const [showOptions, setShowOptions] = useState(false);
   const [result, setResult] = useState(null);
@@ -212,6 +243,10 @@ const StockPage = () => {
     setShowSellModal(false);
     setQuantity('');
   };
+  const MemoizedChart = React.memo(({ options, series }) => (
+    <ReactApexChart options={options} series={series} type="candlestick" height={500} width={1150} />
+  ));
+  
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
@@ -220,9 +255,11 @@ const StockPage = () => {
     <div className="stock-page">
       <Navbar />
       <div className="stock-content">
-        <h1>Stock: {symbol}</h1>
+      <h1>Stock: {symbol} {currentPrice !== null && `- Current Price: $${currentPrice.toFixed(2)}`}</h1>
+
         <div className="chart-container">
-          <ReactApexChart options={options} series={series} type="candlestick" height={500} width={1150} />
+          {/* <ReactApexChart options={options} series={series} type="candlestick" height={500} width={1150} /> */}
+          <MemoizedChart options={options} series={series} />
         </div>
         <div className="action-buttons">
           <button className="btn buy-btn" onClick={handleBuy}>Buy</button>
