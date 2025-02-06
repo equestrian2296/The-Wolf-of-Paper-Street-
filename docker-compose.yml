@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "5000:5000"
+    environment:
+      - PROD_Key=surya
+    
+  frontend:
+    build: ./wolfofpaperstreet
+    ports:
+      - "4000:3000"
+    
+

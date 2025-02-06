@@ -105,7 +105,7 @@ export default NewsPage;
 async function getRecommendations(endpoint, content) {
   const requestBody = { content };
   const response = await fetch(
-    `http://localhost:5000/${endpoint}`,
+      `http://localhost:5000/${endpoint}`,
     { method: 'POST', body: JSON.stringify(requestBody), headers: { "Content-Type": "application/json" } }
   );
   return await response.json();

@@ -6,6 +6,12 @@ const yahooFinance = require('yahoo-finance2').default;
 const { RSI, SMA, EMA } = require("technicalindicators");
 const ModelClient = require("@azure-rest/ai-inference").default;
 const { AzureKeyCredential } = require("@azure/core-auth");
+(async () => {
+    const { sharpeRatio } = await import('portfolio-analysis');
+    console.log(sharpeRatio);
+})();
+
+
 const app = express();
 
 app.use(cors());
@@ -209,35 +215,42 @@ app.post("/sharpe", async (req, res) => {
     try {
         let { symbol, from, to } = req.body;
 
-        if (!symbol) {
-            return res.status(400).json({ error: "Please provide a stock symbol" });
+        if (!symbol || !from || !to) {
+            return res.status(400).json({ error: "Please provide symbol, from, and to dates in YYYY-MM-DD format" });
         }
 
-        // If 'from' and 'to' are missing, default to last 1 year
-        if (!from || !to) {
-            to = Math.floor(Date.now() / 1000);
-            from = to - (365 * 24 * 60 * 60);
-        } else {
-            from = isNaN(from) ? convertToTimestamp(from) : parseInt(from);
-            to = isNaN(to) ? convertToTimestamp(to) : parseInt(to);
+        // Convert Dates to Unix Timestamp
+        const fromTimestamp = Math.floor(new Date(from).getTime() / 1000);
+        const toTimestamp = Math.floor(new Date(to).getTime() / 1000);
+
+        // Fetch Stock Data
+        const apiKey = "cugncbhr01qr6jnd86ogcugncbhr01qr6jnd86p0"; // Replace with your Finnhub API Key
+        const url = `https://finnhub.io/api/v1/stock/candle?symbol=${symbol}&resolution=D&from=${fromTimestamp}&to=${toTimestamp}&token=${apiKey}`;
+        
+        const response = await axios.get(url);
+
+        if (response.data.s !== "ok") {
+            return res.status(400).json({ error: "Invalid stock symbol or date range" });
         }
 
-        const prices = await getHistoricalData(symbol, from, to);
-        if (!prices || prices.length === 0) return res.status(400).json({ error: "No data found" });
+        const prices = response.data.c; // Closing prices
 
-        const { sharpeRatio, stdDev, meanReturn } = calculateSharpeRatio(prices);
+        if (prices.length < 2) {
+            return res.status(400).json({ error: "Not enough data to calculate Sharpe Ratio" });
+        }
 
-        res.json({
-            symbol,
-            from: new Date(from * 1000).toISOString().split("T")[0],
-            to: new Date(to * 1000).toISOString().split("T")[0],
-            sharpeRatio: sharpeRatio.toFixed(2),
-            standardDeviation: stdDev.toFixed(4),
-            meanReturn: (meanReturn * 100).toFixed(2) + "%"
-        });
+        // Calculate Daily Returns
+        const returns = prices.map((price, i, arr) => (i === 0 ? 0 : (price - arr[i - 1]) / arr[i - 1])).slice(1);
+
+        // Compute Sharpe Ratio using portfolio-tools
+        const riskFreeRate = 0.02 / 252; // Assume 2% annual risk-free rate, converted to daily
+        const sharpe = sharpeRatio(returns, riskFreeRate);
+
+        res.json({ symbol, sharpeRatio: sharpe.toFixed(4) });
 
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error(error);
+        res.status(500).json({ error: "Error calculating Sharpe Ratio" });
     }
 });
 
@@ -289,59 +302,7 @@ const openai = new OpenAI({
     baseURL: "https://models.inference.ai.azure.com",
     apiKey: "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"
   });
-  
-  
-  // 🔥 API Endpoint for Stock Analysis
-  //app.post("/analyze", async (req, res) => {
-  //	try {
-  //		const { stockSymbol } = req.body; // Expecting { "stockSymbol": "AAPL" }
-  //
-  //		if (!stockSymbol) {
-  //			return res.status(400).json({ error: "Stock symbol is required" });
-  //		}
-  //
-  //		// 1️⃣ Fetch Real-Time Stock Data
-  //		const stockData = await yahooFinance.quoteSummary(stockSymbol, { modules: ["price", "summaryDetail"] });
-  //
-  //		if (!stockData || !stockData.price) {
-  //			return res.status(404).json({ error: "Stock data not found" });
-  //		}
-  //
-  //		// Extract relevant stock info
-  //		const { regularMarketPrice, marketCap, fiftyDayAverage, twoHundredDayAverage } = stockData.price;
-  //		const { forwardPE, dividendYield } = stockData.summaryDetail;
-  //
-  //		// 2️⃣ Send Data to OpenAI for Analysis
-  //		const prompt = `
-  //		  You are a stock trading assistant. Based on the following real-time stock data, provide a recommendation on whether it's a good buying opportunity and also give me score out of 100:
-  //		  - Stock Symbol: ${stockSymbol}
-  //		  - Current Price: $${regularMarketPrice}
-  //		  - 50-Day Moving Average: $${fiftyDayAverage}
-  //		  - 200-Day Moving Average: $${twoHundredDayAverage}
-  //		  - Forward P/E Ratio: ${forwardPE}
-  //		  - Market Cap: ${marketCap}
-  //		  - Dividend Yield: ${dividendYield ? dividendYield * 100 + "%" : "N/A"}
-  //	  `;
-  //
-  //		const response = await openai.chat.completions.create({
-  //			model: "gpt-4o",
-  //			messages: [
-  //				{ role: "system", content: "Analyze the stock data and provide a buy/sell recommendation." },
-  //				{ role: "user", content: prompt },
-  //			],
-  //			temperature: 0.7,
-  //			max_tokens: 200,
-  //			top_p: 1,
-  //		});
-  //
-  //		const recommendation = response.choices[0].message.content;
-  //		res.json({ stockSymbol, recommendation });
-  //
-  //	} catch (error) {
-  //		console.error("Error:", error);
-  //		res.status(500).json({ error: "Internal Server Error" });
-  //	}
-  //});
+
   
   
   app.post("/analyze", async (req, res) => {
@@ -375,7 +336,7 @@ const openai = new OpenAI({
 // meta AI analyse
 const client = new ModelClient(
     "https://models.inference.ai.azure.com",
-    new AzureKeyCredential("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")
+    new AzureKeyCredential("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")
 );
 
 
