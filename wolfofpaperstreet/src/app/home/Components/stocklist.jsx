@@ -15,7 +15,6 @@ const StockList = () => {
             <StockItem stock={stock} type="positive" />
           </Link>
         ))}
-        <a href="#">largest daily growth</a>
       </div>
 
       {/* Largest Daily Drop Section */}
@@ -26,7 +25,6 @@ const StockList = () => {
             <StockItem stock={stock} type="negative" />
           </Link>
         ))}
-        <a href="#">largest daily drop</a>
       </div>
     </div>
   );

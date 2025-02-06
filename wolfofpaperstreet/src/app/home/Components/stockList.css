@@ -5,38 +5,42 @@
     padding: 10px;
     border-bottom: 1px solid #ddd;
     flex-wrap: wrap; /* Allow items to wrap to fit better */
-  }
-  
-  .stock-name {
+    background-color: #2a2a2a; /* Updated background color */
+    border-radius: 8px; /* Added border radius for better aesthetics */
+}
+
+.stock-name {
     flex: 2 1 150px; /* Allow it to grow but maintain a minimum width */
     font-weight: bold;
     word-wrap: break-word; /* Ensure long names wrap properly */
-  }
-  
-  .stock-symbol {
+    color: #ffffff; /* Updated text color */
+}
+
+.stock-symbol {
     flex: 1 1 100px; /* Allow it to grow but maintain a minimum width */
     background-color: #f0f0f0;
     padding: 5px 10px;
     border-radius: 5px;
     text-align: center;
-  }
-  
-  .stock-price {
+}
+
+.stock-price {
     flex: 1 1 100px; /* Allow it to grow but maintain a minimum width */
     font-weight: bold;
     text-align: right;
-  }
-  
-  .stock-change {
+    color: #00ffea; /* Updated text color */
+}
+
+.stock-change {
     flex: 1 1 100px; /* Allow it to grow but maintain a minimum width */
     text-align: right;
-  }
-  
-  .stock-change.positive {
-    color: green;
-  }
-  
-  .stock-change.negative {
-    color: red;
-  }
-  
+}
+
+.stock-change.positive {
+    color: #00ff00; /* Updated to a brighter green */
+}
+
+
+.stock-change.negative {
+    color: #ff0000; /* Updated to a brighter red */
+}

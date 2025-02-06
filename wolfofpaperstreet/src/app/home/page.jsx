@@ -7,6 +7,7 @@ import StockScroller from "./Components/home";
 import StockList from "./Components/stocklist";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import Link from "next/link";
+import Image from "next/image";
 
 const HomePage = () => {
   const [userData, setUserData] = useState(null);
@@ -64,12 +65,28 @@ const HomePage = () => {
         </div>
 
         {/* User Profile */}
-        <div className="bg-gray-800 p-6 rounded-lg border-2 border-yellow-400 shadow-lg flex flex-col items-center w-full max-w-xs mx-auto">
+        <div className="bg-gray-800 p-6 rounded-lg border-2 border-yellow-400 shadow-lg flex flex-col items-center w-full max-w-xs mx-auto h-full justify-between">
+          {/* User Logo - Positioned at the top */}
+          <div className="w-full flex justify-center">
+            <Image
+              src="/logo.png"
+              alt="User Logo"
+              width={80}
+              height={80}
+              className="mb-4"
+            />
+          </div>
+
+          {/* User Info - Positioned at the bottom */}
           {userData && (
-            <>
-              <h2 className="mt-2">{userData.name}</h2>
-              <p className="text-green-400">Balance: ${userData.balance}</p>
-            </>
+            <div className="text-center w-full">
+              <h2 className="text-xl font-semibold text-white animate-pulse" style={{ textShadow: "0 0 10px #FFD700" }}>
+                {userData.name}
+              </h2>
+              <p className="text-green-400 mt-2 text-lg">
+                Balance: ₹{parseFloat(userData.balance).toFixed(2)}
+              </p>
+            </div>
           )}
         </div>
 
@@ -88,16 +105,15 @@ const HomePage = () => {
       </div>
 
       {/* Floating Buttons */}
-      <div className="fixed bottom-24 left-10 right-10 flex justify-between">
-        {/* Updated Button with Link to /backtest */}
+      <div className="fixed bottom-24 left-10 right-10 flex justify-between px-4">
         <Link href="/backtest">
-          <button className="bg-purple-600 text-white px-5 py-3 rounded-lg shadow-lg border-2 border-purple-400 hover:bg-purple-800">
+          <button className="bg-purple-600 text-white text-lg px-8 py-4 rounded-lg shadow-lg border-2 border-purple-400 hover:bg-purple-800 w-48 h-16 flex justify-center items-center">
             Trade in Past
           </button>
         </Link>
 
         <Link href="/stocks">
-          <button className="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg border-2 border-green-400 hover:bg-green-700">
+          <button className="bg-green-500 text-white text-lg px-8 py-4 rounded-lg shadow-lg border-2 border-green-400 hover:bg-green-700 w-48 h-16 flex justify-center items-center">
             Go Trade
           </button>
         </Link>

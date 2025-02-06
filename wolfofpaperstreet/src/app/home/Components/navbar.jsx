@@ -40,6 +40,7 @@ const navbar = ({ position = "bottom" }) => {
     <nav className={`radial-container ${position}`}>
       <button className="menu-button" onClick={toggleMenu} aria-label="Toggle Menu">
         🐺
+        Explore!!
       </button>
 
       <div className={`radial-menu ${open ? "open" : ""}`}>

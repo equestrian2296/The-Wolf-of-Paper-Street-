@@ -287,7 +287,7 @@ app.get("/indicators", async (req, res) => {
 
 const openai = new OpenAI({
     baseURL: "https://models.inference.ai.azure.com",
-    apiKey: ""
+    apiKey: "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"
   });
   
   
@@ -375,7 +375,7 @@ const openai = new OpenAI({
 // meta AI analyse
 const client = new ModelClient(
     "https://models.inference.ai.azure.com",
-    new AzureKeyCredential("")
+    new AzureKeyCredential("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")
 );
 
 

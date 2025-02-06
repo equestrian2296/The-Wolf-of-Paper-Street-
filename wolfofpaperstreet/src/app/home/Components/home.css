@@ -1,51 +1,54 @@
+/* STOCK SCROLLER - MOVING TICKER (NAVBAR) */
 .stock-scroller {
-  overflow: hidden;
-  padding: 1rem;
-  display: flex;
-  flex-direction: row;
-  border-radius: 0.5rem;
-  height: 100px;
   width: 95vw;
- 
+  overflow: hidden;
+  white-space: nowrap;
+  position: relative;
+  padding: 10px;
 }
 
+/* Stock Container - No Motion Effect */
 .stock-container {
   display: flex;
-  flex-direction: row;
   gap: 1rem;
-  padding: 1rem;
-  border-radius: 0.5rem;
+  /* Removed animation */
 }
 
+/* Individual Stock Item (NAVBAR) */
 .stock-item {
-  height: 60px;
   display: flex;
   align-items: center;
-  color: black;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
   border-radius: 0.5rem;
-  margin-right: 1.5rem;
-  padding: 20px;
- 
+  padding: 12px 20px;
+  min-width: 160px;
 }
 
-.stock-name {
-  font-weight: 600;
-  color: black;
+/* STOCK LIST - STATIC IN ITS TILE */
+.stock-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  width: 300px; /* Adjust width */
 }
 
-.stock-value {
-  margin-left: 0.5rem;
-  color: #6b7280;
+/* Individual Stock List Item - STAYS STATIC */
+.stock-list-item {
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 10px;
+  border-radius: 0.5rem;
+  text-align: center;
+  color: rgb(0, 0, 0);
 }
 
-.stock-change {
-  margin-left: 0.5rem;
-}
-
-.stock-change.negative {
-  color: #ef4444;
-}
-
-.stock-change.positive {
-  color: #10b981;
+/* MAKE STOCKLIST & PROFILE TABS SMALLER */
+.stocklist, .profile {
+  width: 200px;
+  padding: 10px;
+  font-size: 0.9rem;
 }

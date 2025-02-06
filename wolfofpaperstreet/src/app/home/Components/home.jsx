@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import "./home.css";
 
@@ -34,18 +33,7 @@ const StockScroller = () => {
 
   return (
     <div className="stock-scroller">
-      <motion.div
-        className="stock-container"
-        animate={{
-          x: [0, -1000], // Continuous scrolling
-        }}
-        transition={{
-          repeat: Infinity,
-          repeatType: "loop",
-          duration: 20,
-          ease: "linear",
-        }}
-      >
+      <div className="stock-container">
         {[...stockData, ...stockData].map((stock, index) => (
           <div
             key={index}
@@ -59,7 +47,7 @@ const StockScroller = () => {
             </span>
           </div>
         ))}
-      </motion.div>
+      </div>
     </div>
   );
 };

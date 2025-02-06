@@ -53,9 +53,16 @@ const Login = () => {
         await signInWithEmailAndPassword(auth, email, password);
         router.push('/home');
       }
-    } catch (error: any) {
-      console.error('Error during auth operation:', error.message);
-      setError(getErrorMessage(error.code));
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error('Error during auth operation:', error.message);
+      }
+
+      if (typeof error === 'object' && error !== null && 'code' in error) {
+        setError(getErrorMessage((error as { code: string }).code));
+      } else {
+        setError('An unexpected error occurred.');
+      }
     } finally {
       setLoading(false);
     }
@@ -117,7 +124,7 @@ const Login = () => {
             </>
           ) : (
             <>
-              Don't have an account?{' '}
+              Don&rsquo;t have an account?{' '}
               <span className={styles.toggleLink} onClick={() => setIsSignUp(true)}>
                 Sign Up here
               </span>
@@ -126,7 +133,13 @@ const Login = () => {
         </p>
       </div>
       <div className={styles.imageContainer}>
-        <Image src="/bg.webp" alt="Background" layout="fill" objectFit="cover" />
+        <Image 
+          src="/bg.webp" 
+          alt="Background" 
+          fill 
+          style={{ objectFit: 'cover' }} 
+          priority 
+        />
       </div>
     </div>
   );
